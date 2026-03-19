@@ -3,6 +3,8 @@
 :root {
   --background: #f9fafb;
   --foreground: #111827;
+  --brand-from: #2563eb;
+  --brand-to: #7c3aed;
 }
 
 @theme inline {
@@ -16,4 +18,71 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-sans), Arial, Helvetica, sans-serif;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideInRight {
+  from { opacity: 0; transform: translateX(100%); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes slideOutRight {
+  from { opacity: 1; transform: translateX(0); }
+  to { opacity: 0; transform: translateX(100%); }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+@keyframes progressStripe {
+  0% { background-position: 0 0; }
+  100% { background-position: 40px 0; }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.3s ease-out both;
+}
+
+.animate-slide-up {
+  animation: slideUp 0.35s ease-out both;
+}
+
+.animate-slide-in-right {
+  animation: slideInRight 0.3s ease-out both;
+}
+
+.animate-slide-out-right {
+  animation: slideOutRight 0.25s ease-in both;
+}
+
+.animate-shimmer {
+  background: linear-gradient(90deg, transparent 25%, rgba(255,255,255,0.4) 50%, transparent 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+.animate-progress-stripe {
+  background-image: linear-gradient(
+    45deg,
+    rgba(255,255,255,0.2) 25%,
+    transparent 25%,
+    transparent 50%,
+    rgba(255,255,255,0.2) 50%,
+    rgba(255,255,255,0.2) 75%,
+    transparent 75%
+  );
+  background-size: 40px 40px;
+  animation: progressStripe 0.8s linear infinite;
 }
