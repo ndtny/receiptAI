@@ -2,6 +2,7 @@
 
 import { useRef, useState, useCallback } from "react";
 import { compressImage } from "@/lib/image";
+import { pdfToImage } from "@/lib/pdf";
 import { useToast } from "./Toast";
 
 interface Props {
@@ -9,7 +10,7 @@ interface Props {
 }
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
-const ACCEPTED_TYPES = ["image/jpeg", "image/png", "image/webp", "image/heic", "image/heif"];
+const ACCEPTED_TYPES = ["image/jpeg", "image/png", "image/webp", "image/heic", "image/heif", "application/pdf"];
 
 export default function ImageCapture({ onImageCaptured }: Props) {
   const fileRef = useRef<HTMLInputElement>(null);
@@ -19,8 +20,8 @@ export default function ImageCapture({ onImageCaptured }: Props) {
   const { toast } = useToast();
 
   function validateFile(file: File): boolean {
-    if (!file.type.startsWith("image/") && !ACCEPTED_TYPES.includes(file.type)) {
-      toast("Please upload an image file (JPEG, PNG, WebP)", "error");
+    if (!file.type.startsWith("image/") && file.type !== "application/pdf") {
+      toast("Please upload an image or PDF file", "error");
       return false;
     }
     if (file.size > MAX_FILE_SIZE) {
@@ -33,11 +34,13 @@ export default function ImageCapture({ onImageCaptured }: Props) {
   async function processFile(file: File) {
     if (!validateFile(file)) return;
     try {
-      const base64 = await compressImage(file);
+      const base64 = file.type === "application/pdf"
+        ? await pdfToImage(file)
+        : await compressImage(file);
       setPreview(base64);
       onImageCaptured(base64);
     } catch {
-      toast("Failed to process image. Please try another file.", "error");
+      toast("Failed to process file. Please try another one.", "error");
     }
   }
 
@@ -77,7 +80,7 @@ export default function ImageCapture({ onImageCaptured }: Props) {
 
   return (
     <div className="space-y-3 animate-fade-in">
-      <input ref={fileRef} type="file" accept="image/*" onChange={handleFile} className="hidden" aria-label="Upload receipt image" />
+      <input ref={fileRef} type="file" accept="image/*,application/pdf" onChange={handleFile} className="hidden" aria-label="Upload receipt image or PDF" />
       <input ref={cameraRef} type="file" accept="image/*" capture="environment" onChange={handleFile} className="hidden" aria-label="Take photo of receipt" />
 
       <button
@@ -98,7 +101,7 @@ export default function ImageCapture({ onImageCaptured }: Props) {
         <p className="text-sm font-medium text-gray-700">
           {dragging ? "Drop your image here" : "Click or drag & drop to upload"}
         </p>
-        <p className="text-xs text-gray-400 mt-1">JPEG, PNG, WebP — up to 10 MB</p>
+        <p className="text-xs text-gray-400 mt-1">JPEG, PNG, WebP, PDF — up to 10 MB</p>
       </button>
 
       <button
